@@ -7,6 +7,10 @@ const userSchema = new Schema({
         required: true,
         max: 64
     },
+    image: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,
