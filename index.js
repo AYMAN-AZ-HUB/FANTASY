@@ -1,11 +1,13 @@
 import './config/database.js';
 import express from 'express';
 import dotenv from 'dotenv';
+import adminroutes from "./routes/adminroutes.js";
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
+app.use("/api", adminroutes);
 
 const PORT = process.env.PORT || 5000;
 
