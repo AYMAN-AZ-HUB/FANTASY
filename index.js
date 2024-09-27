@@ -1,5 +1,6 @@
 import './config/database.js';
 import express from 'express';
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import adminroutes from "./routes/adminroutes.js";
 import userroutes from "./routes/userroutes.js";
@@ -8,6 +9,7 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/api", adminroutes);
 app.use("/api", userroutes);
 

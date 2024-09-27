@@ -1,6 +1,29 @@
 import User from '../models/user.js';
+import cloudinary from 'cloudinary';
+import path from 'path';
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { Readable } from 'stream';
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+});
+
+const uploadToCloudinary = (buffer) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.v2.uploader.upload_stream(
+            { folder: "users" },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        );
+
+        Readable.from(buffer).pipe(stream);
+    });
+};
 
 export const login = async (req, res) => {
     try {
@@ -36,6 +59,14 @@ export const register = async (req, res) => {
     try {
         const { fullname, email, password } = req.body;
 
+        // Ensure the image exists
+        if (!req.files || !req.files.image || req.files.image.length === 0) {
+            return res.status(400).json({ message: 'Image is required' });
+        }
+
+        // Upload the image to Cloudinary
+        const mainImageResult = await uploadToCloudinary(req.files.image[0].buffer);
+
         // Check if user already exists
         let user = await User.findOne({ email });
         if (user) {
@@ -46,17 +77,22 @@ export const register = async (req, res) => {
         user = new User({
             fullname,
             email,
-            password
+            password,
+            image: mainImageResult.secure_url, // Use the URL from Cloudinary
         });
 
         // Save the user to the database
         await user.save();
+
+        // Optionally, send a success response
+        res.status(201).json({ message: 'User registered successfully', user });
 
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');
     }
 };
+
 
 export const getUsers = async (req, res) => {
     try {
