@@ -5,7 +5,7 @@ const userSchema = new Schema({
     fullname: {
         type: String,
         required: true,
-        max: 64
+        maxLength: 64
     },
     image: {
         type: String,
@@ -19,8 +19,35 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true,
-        min: 8
+        minLength: 8
     },
+    team: [{
+        Captain: {
+            type: String,
+            required: true,
+            maxLength: 64
+        },
+        Player_1: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        Player_2: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        Player_3: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        Player_4: {
+            type: String,
+            required: true,
+            unique: true
+        },
+    }],
     role: {
         type: String,
         default: 'user',
